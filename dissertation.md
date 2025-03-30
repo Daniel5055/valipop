@@ -30,11 +30,11 @@ the copyright in this work.
 
 ## Contents page
 
-## Introduction
+## 1. Introduction
 
-## Context Survey
+## 2. Context Survey
 
-### ValiPop
+### 2.1. ValiPop
 
 ValiPop is a program for simulating synthetic genealogical populations from a collection of desired statistics. It also validates that the simulated population conforms to the desired statistics and writes out the population as series of birth, death, and marriage records.
 
@@ -46,11 +46,11 @@ To evaluate the data linkage algorithms in Dr. Dalton's thesis, the synthetic po
 
 Dr. Dalton completed his thesis in 2022 and the final commit to ValiPop was made in early 2023. However, as ValiPop was developed to be used in Dr. Dalton's thesis, it was not easily accessible or usable for general users. Eventually, ValiPop no longer compiled due to broken dependencies by late 2024.
 
-## Requirements Specification
+## 3. Requirements Specification
 
 This chapter lists the original requirements as documented in the Description, Objectives, Ethics & Resources (DOER) document submitted in the first semester. To differentiate between ValiPop before and after my dissertation work, I will refer to the ValiPop version before my dissertation as the *old ValiPop*
 
-### Primary
+### 3.1 Primary requirements
 
 1. **Pruning old data**. The old ValiPop repository is closely related to the Ph.D. thesis it was developed with, containing many data files and results not relevant to a general user. The sample statistics provided by the repository should also be checked to have open licenses to avoid ethical concerns.
 
@@ -62,7 +62,7 @@ This chapter lists the original requirements as documented in the Description, O
 
 5. **Restoring the simulation source code**. Some features such as exporting populations to different file formats are invoked in tests but not callable by the user in the old ValiPop. These features should be restored and made accessible to users, and any existing bugs in the old ValiPop generally should be resolved also. 
 
-### Secondary
+### 3.2. Secondary requirements
 
 6. **Offering the build artefact**. In the old ValiPop, users must clone, compile and execute the program to run it. Ideally, users should be able to download a pre-compiled artefact to run ValiPop easily.
 
@@ -74,11 +74,11 @@ This chapter lists the original requirements as documented in the Description, O
 
 10. **Improve the program interface**. The old ValiPop can only be interacted with through invoking the necessary commands in a terminal. Creating a simple terminal or graphical user interface would help less technical users interact with the program more easily.
 
-## Software Engineering Approach
+## 4. Software Engineering Approach
 
 This project is not a typical software development project as it focuses on restoring existing legacy code as opposed to developing my own software from scratch. Therefore, I took a more cautious approach when working on ValiPop as it was critical that the existing functionality was preserved. Consequently, my approach was divided into several steps which started small but were gradually built up.
 
-### Study the code
+### 4.1. Study the code
 
 The first step was to determine the state of the old ValiPop program and identify how it operated. The existing documentation included with the old ValiPop seemed out-of-date, so I resulted to reading through the source code to gather an understanding of the execution flow. Reading Dr. Dalton's thesis also provided insight into many features of the old ValiPop such as the options supported during execution. Once I had a rudimentary understanding of the program, I met with Dr. Dalton in-person to clarify additional details such as the statistics behind the population validation.
 
@@ -88,7 +88,7 @@ The first step was to determine the state of the old ValiPop program and identif
     - Asking questions to PHD student
     - Documenting code as I read through it
 
-### Execute the program
+### 4.2. Execute the program
 
 Once I had a decent understanding of the old ValiPop, I attempted to execute the program. This included identifying and installing the necessary dependencies, modifying the source code to support execution on my machine, and fixing any errors that occurred during the process. With each attempt at running ValiPop, I needed to ensure the generated population was validated and written to records correctly.
 
@@ -97,7 +97,7 @@ Once I had a decent understanding of the old ValiPop, I attempted to execute the
     - Fixing any immediate errors that occur during execution
     - Ensuring the results are correct
 
-### Simplify execution
+### 4.3. Simplify execution
 
 After successful running ValiPop on my machine, I proceeded to work on making it more easily executable. I identified and removed unnecessary dependencies, as well as created a virtual environment to aid in installing the R dependencies. I additionally replaced hard-coded file paths with configurable paths, eventually being able to build and execute ValiPop on any Unix-like machine in a few steps.
 
@@ -110,7 +110,7 @@ To support running ValiPop on other operating systems like Windows, I later cont
         - Removing unncessary R packages
         - Removing shell scripts and external scripts
 
-### Simplify development
+### 4.4. Simplify development
 
 Once I could execute ValiPop more easily, I focused on restoring the testing. The tests were initially broken for the old ValiPop, however I managed to recover them by fixing the problematic dependencies. Once restored, I implemented end-to-end tests which ensured ValiPop returned the same output given some input. This then allowed me to refactor and simplify sections of ValiPop whilst guaranteeing the same functionality.
 
@@ -119,7 +119,7 @@ Once I could execute ValiPop more easily, I focused on restoring the testing. Th
         - End to end tests to ensure changes do not lead to inconsitency
     - Refactoring complex sections
 
-### Integrate features
+### 4.5. Integrate features
 
 With some additional testing established, I then worked on integrating additional features which improve the user experience of ValiPop. This included integrating the additional output formats, like GEDCOM which was already implemented, into the main program to be accessible by the user. I also added additional error handling when reading input to help users identify mistakes in their input configurations. Notably, whilst implementing error handling, I identified and fixed several bugs caused by unusual configuration options.
 
@@ -128,8 +128,9 @@ With some additional testing established, I then worked on integrating additiona
     - Integrating features developed but not added to the main program.
 
 - May talk about factor search here
+- Removing birth factor and death factor
 
-### Documentation
+### 4.6. Documentation
 
 Throughout my software engineering approach, I wrote documentation about ValiPop. Whilst studying the code of the old ValiPop, I documented what I learned in the form of JavaDoc. I also hosted additional documentation from the Github repository, detailing the steps to compile and execute ValiPop both locally and with a container. To document the configuration options, input statistics, and results, I included reference sheets in the hosted documentation which explain each aspect briefly.
 
@@ -139,7 +140,7 @@ To support the future development of ValiPop, I also wrote documentation explain
     - Analysis of memory usage using Spark
     - Reducing the memory footprint
 
-## Ethics
+## 5. Ethics
 
 The genealogical populations generated by ValiPop are completely fabricated based on the input statistics provided, and do not reflect any real families or individuals. The input statistics provided by the ValiPop repository should also be publicly available to use and redistribute. Therefore, I believe this project did not raise any ethical issues and I completed a preliminary ethics self-assessment form to confirm this.
 
@@ -150,38 +151,261 @@ To ensure the ValiPop repository only included open and redistributable data, I 
 - No ethics, attach sheet
 - Worth mentioning the existing data is open and free use
 
-## Design
+## 6. Design and Implementation
 
-- How the project is designed already
-    - Population in simulation
-    - R analysis
-        - How this is unusual
-    - Result recording
-    - Emphasis on the complexity of legacy code, and why total refactoring or rewriting is not feasable
-- Clarify the design represents how I planned to improve the legacy code
-    - Need to extract local references from the project
-    - Make it easy executable
-        - Virtualising R
-        - Consider using Renjin
-        - Settling to storing and executing scripts packaged within the jar
-    - Make it easily distributable
-        - Considered shipping versions with a scripts to run the program
-        - Instead reducing the dependencies and shipping the program directly
-    - Make the interface simple
-    - Add the clear and in-depth documentation
+This chapter details the important design decisions made during my restoration of ValiPop, as well as how I implemented those changes. ValiPop is divided into three phases during its execution, the simulation phase which generates the population, the validation phase which compares the population to the statistics, and the results recording phase where the population records are written. For each of these phases, I will briefly describe how they were originally designed and focus on the changes I made to each of these phases. I will also discuss the additional developments and documentation improvements I made to ValiPop in general.
 
-## Implementation
+### 6.1. The Population Simulation
 
-- Details on how I handled the R packages and virtual environment
-- How I containerised the project and identified the necessary dependencies
-    - How I used and Spark to support distributed factor searching
-- How I specifically repaired tests and added e2e tests
-    - How the e2e tests ensure my changes do not change the functionality
-- How I integrated the R calling and analysis scripts directly into Java
-- How I refactored certain sections and why they were necessary
-- The specific steps I took to reduce memory usage
+The ValiPop population simulation is written in Java. On executing ValiPop, it reads in the given configuration options and input statistics. The configuration options define properties of the simulation, such as when to start and end the simulation, and how large the starting population size is. During the population simulation, the input statistics are used to determine how many births, deaths, and other events occur. The simulation also handles partnering and separation between people, migration of people to and from the population, and occupations of people and how they change over time. Consequently, the ValiPop simulation is quite complex, which is why I took a cautious approach with its development.
 
-## Evaluation
+- Don't like the last sentence
+
+#### 6.1.1. End-to-end Testing
+
+Before making impactful changes to the ValiPop simulation, I wanted to ensure I did not alter its functionality unknowingly. Therefore, I added end-to-end tests targeting the population simulation, which confirm that given the same inputs, the population simulation will generate the same population. Thus if were to refactor or restructure the code, I could verify that those changes would not change the end result for the user. Whilst there did already exist tests for the population simulation, these were typically unit tests testing specific interface implementations.
+
+To create these tests, I originally considered storing a collection of population records, pregenerated from a variety of configurations. Then the program could be tested by regenerating the records using the same configurations and comparing them with the stored records. However, I found that the records generated from the population simulation could grow to millions of rows depending on the population sizes tested, meaning I would have needed to store hundreds of megabytes of record files in the repository to use for testing.
+
+Therefore, I instead opted to calculate and save the MD5 checksum of the pregenerated population records. The population simulation can still be run with the same configurations, and then the MD5 checksum of the generated files are also calculated and compared with the saved checksum. I found this to be an effective solution as it allowed for verifying the outputted record files without needing to store a whole copy. Moreover, the probability of different files generating the same checksum is very unlikely, so I can be relatively certain in its correctness. (cite)
+
+Overall, I expanded the ValiPop testing to include seven end-to-end tests which generated populations varying in size from 10,000 to 1,000,000 people, and used these tests to the verify that the population simulation remains consistent.
+
+- Before making changes, wanted to guarantee overall functionality remained the same
+- Adding tests which focus on confirming the population simulation
+    - Originally considered storing a collection of population records generated from various configuration files
+    - Then test by regenerating records using the configurations and comparing with the stored records.
+    - However record files can be quite large, and would greatly increase the size of the repository if wanted to have multiple records
+- Instead of saving population records, their MD5 checksum is saved.
+    - checksum can then be calculated from new records and compared with the saved checksum
+    - Very unlikely to have same checksum if the files are different
+
+#### 6.1.2. Removing deprecated options
+
+Upon studying the configuration options, and establishing end-to-end tests, I was able to identify several deprecated options. As ValiPop's commit history extends back as far as 2014, it has gone through several iterations and major changes. Therefore, it was not unexpected to discover options no longer in use.
+
+One such option was `geography_source_location`, which likely specified path to a file containing the possible addresses people could live at. However, this seemed to have since moved to same directory as the input statistics, thus allowing me to remove this unnecessary option.
+
+The other deprecated options where `birth_factor` and `death_factor`, which were more subtle due to them still influencing the program. Theses factors were used for correcting the simulation if it deviated from the statistics, by altering the number of births or deaths to occur. However, I noticed that `recovery_factor` and `proportional_recovery_factor` were used for the same purpose, but did so more generally by applying to all input statistics rather than just births and deaths. I was able to verify that the original factors were deprecated during my meeting with Dr. Dalton, and so could safely remove them.
+
+I believe that removing deprecated features was relevant to restoring ValiPop as it ultimately simplifies the interface for users. With fewer configuration options for ValiPop, the documentation can be more succinct and configuration could be less intimidating with fewer required options. Of course in removing deprecated options, I would verify that the functionality was not altered through manual testing, and the automated end-to-end tests.
+
+- After studying options, identified several options which seemed to have little impact on the program. 
+    - `geography_source_location` data was moved the input statistics directory
+    - Removed Birth and death Factor, which seemed to be replaced by recovery factor
+        - Confirmed with Dr. Dalton that they were deprecated
+
+#### 6.1.3. Refactoring
+
+- REfactoring OBDModel
+    - Honestly may not be worth mentioning
+
+### 6.2. The Validation
+
+The population validation phase was originally written using R scripts to perform the statistical analysis, and shell scripts to interpret the results of the analysis. These scripts were invoked programmatically from Java, and the interpretation of the analysis was eventually read back into the Java program.
+
+Once the population was generated, it was written to several contingency tables which recorded the frequency of birth, deaths, and partnerships. The expected frequencies of these properties were also calculated from the input statistics, and both are fed to the R analysis scripts. The R scripts compare the expected and actual frequencies using a Generalized Estimating Equations Generalized Linear Model (GEEGLM), and the outputted p values describe the statistical significance between the expected and actual events.
+
+The shell script counted the volume and magnitude of significant p values, and calculated a validation score. The higher the validation score, more significantly different the population was from the input statistics, where zero was the ideal score.
+
+- How validation works
+- R was tricky to work with together with Java
+- Java code invoked R code programmatically from R script files
+- Required that certain R packages were installed and working directory configured correctly
+- Shell scripts then invoked by Java to interpret the results, only natively run on Unix-like machines.
+
+#### 6.2.1. R Virtual Environment
+
+Whilst first trying to execute the old ValiPop, I found running the R scripts successfully to be quite challenging due to the number of dependencies required. Whilst build tools like Maven could automatically fetch the required packages for Java, no such tool was employed for the old ValiPop. Therefore to simplify the installation of R dependencies, I utlised the `renv` package to create and save R virtual environments.
+
+Creating a virtual environment allowed for the list of dependencies to be saved and installed with a single command, much like Maven for Java. It also recorded dependency versions, which helped to preserve the consistency of the R script execution even if R packages were to be updated with breaking changes. This was especially relevant for ValiPop as some of the original R packages used had since updated their interfaces, causing the scripts to be broken by the time I first ran them.
+
+However, initialising the R virtual environment first required users to install `renv`, which added another dependency to ValiPop. Regardless, the R virtual environment still greatly aided in executing ValiPop on different machines as it overall reduced the number of steps needed to setup ValiPop.
+
+Notably, in the later stages of my restoration of ValiPop, I stopped utilising R virtual environments due to reasons described in section [6.2.3]. However it was still relevant in my initial work with ValiPop and highlights how my development process changed over time.
+
+- Originally, utilised renv to create R virtual environments
+    - Allowed for dependency versions to be recorded and all packages to be installed for the repository with a single command
+    - However it did require user to also install the renv package before running
+
+- Regardless, it aided in the early development of ValiPop, although later in 6.2.3. I no longer needed it for future development
+
+#### 6.2.2. Simplifying R dependencies
+
+Another difficulty with the R scripts were the sheer number of them included with the old ValiPop repository. However many of them did not seem relevant to actual execution of ValiPop and may have instead been used for analysis in Dr. Dalton's thesis. Therefore, to help determine which scripts and dependencies were relevant for ValiPop, I established end-to-end tests targeting the population validation.
+
+Similar to the tests described in section [6.1.1], I pre-generated and saved a collection of population contingency tables from a variety of configurations. I also saved the validation score determined by passing them directly to the validation phase. I was then able to test changes to the validation phase by passing in the saved contingency tables and comparing the the resulting validation scores to the expected scores. A downside with this approach was the necessity of storing the collection of contingency tables in the repository, which also grow very large. However they were notably smaller than their equivalent record files, and were necessary for the validation phase to analyse the population.
+
+With these tests established, I was able to removal the majority of R script files whilst preserving the validation functionality. I found that the most of the removed scripts were either deprecated, or used for visualising data about the population. Consequently, this also removed the number of R packages required for the validation, particularly from seven packages down to a single package, `geepack`, which provided the GEEGLM analysis. Overall, this greatly simplified the validation phase without changing the results of validation.
+
+- Establish end to end tests
+    - Using collection of pre generated population data
+        - Then invoking R analysis on the population and comparing with expected validation score
+    - Allows for me to modify R code whilst preserving functionality
+
+- Able to remove much of the R analysis as much of it was analysis intended for the thesis and visualisation
+    - Among the 7 R packages used, only 1 was relevant for generating the analysis interpreted by ValiPop
+    - Also able to remove the majority of R scripts, which were either deprecated, or part of the thesis
+    - Confirming I did not alter results
+
+#### 6.2.3. Distributing R scripts
+
+Another issue with the R scripts and shell scripts used by the old ValiPop was that they were consequently dependencies too. This meant that for users to run ValiPop locally, they would require the ValiPop JAR file executed by Java and the associated scripts run by the JAR file. Moreover, the shell scripts were intended to be run on Unix-like machines with Unix shell, excluding other operating systems like Windows. Therefore I wanted to find a better approach to handling the external scripts used by ValiPop, and also ideally allow ValiPop to be decoupled from the operating system it is run on.
+
+I was able to remove the shell scripts which interpret the R analysis by rewriting them directly in Java. This was quite effective as it only required including some additional IO operations into the Java to read in the R analysis and calculate the validation score directly.
+
+However, I was unable to take the same approach with the R analysis as I found it to complex to implement in Java. Moreover, I was unable to find any equivalent package in Java that could perform the GEEGLM analysis, and determined it would be take too much time to try and implement it myself in Java either.
+
+Alternatively, I considered using the `Renjin` Java package, which allowed for invoking R code directly from Java. This would allow for removing the R scripts completely by rewriting them as strings in Java to be executed. However I found it difficult to incorporate the GEEGLM R package together with `Renjin`. I also felt the act of writing the R scripts in Java to be very error prone, as there was no tooling available to catch mistakes in the process.
+
+Ultimately, I chose to package the R scripts directly in the JAR file itself as a resource. During the execution, the R scripts may be read internally from the JAR file and written to a temporary file. The temporary file may then be executed by R externally, and the analysis can be read into Java to interpret the results. I found this to be the best solution as it allowed users to execute ValiPop with only the JAR file, and further meant I did not need to make major changes to the validation code. Additionally, whilst I could keep the R analysis across several files, they could all be read and written to a single file on execution, avoiding issues caused with importing R files and configuring the working directory (setwd footnote expand on the issue).
+
+Therefore, this ultimately allowed for the validation phase of ValiPop to be run without any external scripts. This meant ValiPop by this point only required Java, the JAR file, R, and the `geepack` R package to run locally. Consequently, I no longer found the R virtual environment necessary as only a single R package was required for the analysis.
+
+- Issue of distributing program, as external shell and R scripts are required (could mentioned shell solution instantly)
+- Considered implementing analysis in Java but could not find any equivalent package in Java to perform analysis (bullet points for this section ?)
+    - Removes dependece on R compleltey, maintance easier
+    - Found too complex to implement myself
+- Considered using Renjin library to invoke R code directly from Java
+    - Would remove external scripts however would need to write the R code as strings in Java
+        - Did not seem maintanable, no tooling
+    - Also added another java dependency, and wound need to link together with R package dependency
+- Instead chose to package the R scripts within the Java JAR file
+    - During execution, R scripts are read internally and written to a temporary file to be executed
+    - R results interpreted directly in Java, removing need for shell scirpts
+    - Whilst R analysis could be written across several files, could write them all to a single file
+        - Makes independent from the R working directory, as no longer concerned with R script paths to import (address issue with cwd in depth?).
+        - No need for cwd combined with only a single dependency, no longer need virtual environments
+    - Whilst this solution this still requires R, it now allows for distributing ValiPop JAR without any extra scripts
+
+### 6.3. The Results Recording
+
+### 6.3.1. Integrating graph formats
+
+- How I integrated graph formats and tested them
+- Adding an extra graph format, geojson
+
+#### 6.3.2. Refactoring record formats
+
+- Noticed how the implementations of each record format were separated but shared similar functionality
+- Choosing to refactor them all under an abstract class, which would handle  generic functionality
+    - like file creation and record writing.
+    - Decouples IO from the format definition
+        - Makes defining formats easier
+
+- Implementation-wise, `Record` class had abstract functions to return iterable of sourceRecords for births, deaths, and marriages respectively given the population. A sourceRecord stored the relevant information to write, and should represent a row of the record format when converted to a string.
+    - Used iterable type to represent collection as only needed a simple interface to handle each element once (speed up (site)?), memory considerations
+- Therefore to implement a new format, just need to implement sourceRecords for births, deaths, and marriages to specify how a row is represented, and implement `Record` class to map the population to a source record for each overridden function
+
+- During this development, also add null safety to much of the formats
+    - Found that rare cases would cause failures due to lack of null safety oversights
+
+### 6.4. Further Developments
+
+#### 6.4.1. Handling User Input
+
+- Adding custom error handling for user inputs and preventing impossible configurations
+- For each option, parse input and on error, notify user of offending option
+    - Allows for users to more easily develop configurations by avoiding ambiguous error messages
+    - Implemented creating parse functions for each type of input, like string, double, positive integer
+        - They catch potential errors which could occur from parsing and throw new custom errors which mention the offending property and reason
+- Additionally added logic to prevent impossible configurations, 
+    - such as start date being greater than the end date
+    - Confirming that some dates were adequately spaced
+        - For example, found some bugs which occured if population was not given enough time to initialise 
+
+#### 6.4.2. Containerisation
+
+- Before distributing R with the JAR file as mentioned before
+    - Focused on containerising ValiPop
+    - Allows for users to download single image
+    - And run without any other dependency except Docker
+    - However downside of complexity of containers
+    - Requires mounting folders to extract data
+
+- Testing dependencies used within the image, allowed me to understand exactly what dependencies were needed
+
+- Initially chose to containerise due to the R scripts and shell scripts also required to run ValiPop
+    - Creating a ValiPop image allows for ValiPop to be distributed as a single artefact requiring only Docker to execute
+    - Images can be uploaded to registries, allowing for ValiPop to be distributed easily
+    - Downside with complexity
+        - Containers are isolated from the local machine, and quite advanced to link them together
+    - Container also helped identify exactly which dependencies were needed
+        - Each run was isolated so could add and remove dependencies
+    - Difficult to implement, containers take a lot of effort to get right
+
+
+#### 6.4.3. Factor Searching
+
+- Discussed how ValiPop handled case where population had poor validation score
+    - Can be tuned with recovery factor
+    - Two programs, factor search and minima search were present to find effective factors
+    - Minima search was implemented to use gradient descent to find best factors, however this was deprecated as it was desgined for birth and death factors mentioned in 6.1.2
+    - Factor search was implemented to find effective factors by testing each combination of a list of recovery and proportional recovery factors
+        - Notably multi threaded, however would require a strong computer due to the memory cost of testing several large population
+        - However I was unable to get working
+
+- Considered two options
+    - Could modify minima search to search for new factors
+        - Perhaps could effectively find factors in fewer simulations
+        - However not certain if changing factors gives continuous results, especially with random seeds
+        - Moreover, would have to be run serially
+    - Rewrtie factor search to support cluster instead of threads
+        - Allows running on multiple machines
+        - Using spark
+
+- Went for the second option, and even containerised to avoid users needing to install spark themselves
+    - Also considered, implementing the entirety of ValiPop using Spark, allowing users to choose to run ValiPop serially or concurrently
+        - However this would make users require Spark to even run the regular ValiPop
+        - And could not see much potential in parallelising the core of ValiPop
+
+#### 6.4.4. Continuous Integration
+
+- To aid me in development, established continuous integration using Github Worflow
+    - Allows for ValiPop to built and tested after every commit to determine if it is functioning
+    - Allows for pushing new images to registry on new commits
+        - As opposed to manually uploading images, less work
+
+- Although found whilst implementing that there are memory limits to the tests
+    - As some of the ValiPop use a lot of memory, forced to scale down some tests for the CI
+    - E2E tests remain, but removed some of the tests which tests larger populations (such as over 500k)
+
+### 6.5. Documenting ValiPop
+
+- Generally about the aim of documentation to help users understand ValiPop 
+- Aimed at both end users and future developers
+- Consequently, needed to be simple to understand but also very detailed
+
+#### 6.5.1. References
+
+- To aid in simplicity, I made use of creating reference sheets which documented concepts in a list like format
+- For example, created reference for configuration option, where for every single option, explain purpose, expected value, and the default
+    - Also provided contents table at the start of the document to make navigation easier (image)
+    - Also created anchor points for each listed option
+        - Allows for other parts of the documentation to link to specific options, allowing users to quickly navigate themselves of property values
+
+- Wrote similar references documenting the possible input statistics and possible results (with linking also).
+    - Notably when explaining directory structures like for results directory, used visual diagrams inspired by the `tree` command (image or text)
+    - Helps users to visualise the structure, and partly acts as a contents page for the reference
+
+#### 6.5.2. Guides
+
+- Created informational documentation on how to run ValiPop both locally and with Docker
+    - Also created guides, which aim go into more detail and guides the user through running ValiPop from start to finished
+    - Provides sample inputs and configurations to let users run ValiPop with, and explains to users how they can further modify the example
+    - Helps readability and supporting new users using ValiPop
+
+#### 6.5.3. Development Documentation
+
+- Additionally provided documentation intended for users seeking to develop further
+- Describes inner workings of population simulation and validation
+    - Explains how the population simulation operates and how it uses each configuration and statistic
+
+## 7. Evaluation
+
+### 7.1. Requirements Met
+
+### 7.2. Challenges
 
 - I underestimated the difficulty to tackling an existing complex project
     - The more I read through the software, the more I saw how complex sections were than what I originally thought
@@ -190,12 +414,27 @@ To ensure the ValiPop repository only included open and redistributable data, I 
     - I feel like my engineering process worked well
     - Altough I also felt like I initially spent too much time reading through the source code
         - And that I should tried experimenting more with execution and parameters to understand how it worked from a blackbox view
-- Could I have simplified execution through other methods?
-    - Considering the time spent and difficulty of containerising
+- difficutly with statistics
+    - Tough to understand, difficult to refactor
+    - Aided by conversations with the disseration student and research into P values
+
+### 7.3. Drawbacks
+
 - I felt like I could have added additional features to the simulation
     - However I also felt that there were also too many aspects left unfinished
     - And how those needed to be polished first
-- Should I compare my work to other projects?
+
+### 7.3. Improvements
+
+- Could I have simplified execution through other methods?
+    - Considering the time spent and difficulty of containerising
+
+- Were I start again would have taken a different approach
+    - More focus on running program early
+    - Should have treated more like a blackbox early on
+    - Less focus on understanding source code
+        - Whilst useful, wasn't relevant to achieving most of the goals
+        - Felt like I understand it much better later on by executing and experimenting with the program
 
 ## Conclusion
 
