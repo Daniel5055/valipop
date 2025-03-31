@@ -64,15 +64,15 @@ This chapter lists the original requirements as documented in the Description, O
 
 ### 3.2. Secondary requirements
 
-6. **Offering the build artefact**. In the old ValiPop, users must clone, compile and execute the program to run it. Ideally, users should be able to download a pre-compiled artefact to run ValiPop easily.
+1. **Offering the build artefact**. In the old ValiPop, users must clone, compile and execute the program to run it. Ideally, users should be able to download a pre-compiled artefact to run ValiPop easily.
 
-7. **Support additional output formats**. In the old ValiPop, the generated population can be represented as records in tabular form, or potentially in some graph formats like GEDCOM. Adding additional formats for ValiPop to represent a population as would be a useful feature to make it more accessible.
+2. **Support additional output formats**. In the old ValiPop, the generated population can be represented as records in tabular form, or potentially in some graph formats like GEDCOM. Adding additional formats for ValiPop to represent a population as would be a useful feature to make it more accessible.
 
-8. **Rewriting the validation code**. Whilst the Old ValiPop simulation code is written in Java, the validation code is written separately in R. This complicates the maintenance and execution of the program, and ideally the validation should be rewritten to Java.
+3. **Rewriting the validation code**. Whilst the Old ValiPop simulation code is written in Java, the validation code is written separately in R. This complicates the maintenance and execution of the program, and ideally the validation should be rewritten to Java.
 
-9. **Expanding the population simulation**. This entails adding additional features to the populations simulation of the old ValiPop, such as more customisable parameters for the populations.
+4. **Expanding the population simulation**. This entails adding additional features to the populations simulation of the old ValiPop, such as more customisable parameters for the populations.
 
-10. **Improve the program interface**. The old ValiPop can only be interacted with through invoking the necessary commands in a terminal. Creating a simple terminal or graphical user interface would help less technical users interact with the program more easily.
+5. **Improve the program interface**. The old ValiPop can only be interacted with through invoking the necessary commands in a terminal. Creating a simple terminal or graphical user interface would help less technical users interact with the program more easily.
 
 ## 4. Software Engineering Approach
 
@@ -473,40 +473,63 @@ Additionally, I included documentation targeted for those seeking to develop Val
 
 ### 7.1. Requirements Met
 
+This section evaluates the work I completed on ValiPop with regards to the original requirements specified. While completing all of the primary requirement and many of the secondary requirements, I also found that some of my work (such as the factor searching) was not captured under the requirements but still contributed to overarching goal of restoring and improving ValiPop.
+
+#### 7.1.1. Primary Requirements Met
+
+The first requirement focused on removing the unnecessary data and content that was included with the original ValiPop. This was achieved through identifying the files I suspected were unnecessary to ValiPop, utilising the end-to-end tests to verify this, and eventually removing them. My work in removing deprecated configuration options also technically contributed towards the requirement and ultimately simplified ValiPop further. I did also verify the usability of the  provided sample statistics, and replaced the licensed statistics with open equivalents.
+
+The second requirement focused on decoupling ValiPop from the machine it was developed on, ultimately allowing it to run on any machine. This was initially achieved through my factoring of the population simulation and validation phases. I ensured file names and paths were configurable, and removed external scripts intended for execution on specific machines such as the shell scripts. Additionally, I containerised ValiPop by defining Docker images, thus allowing for ValiPop to be executed on any operating system without needing to install its dependencies locally.
+
+The third requirement focused on creating a documented, single build artefact, including thorough documentation on ValiPop's configuration, results and development. I created the single build artefact both through containerising ValiPop and through incorporating ValiPop's scripts directly in a single JAR file. I also wrote documentation covering the configuration, results, and development, as well writing user-friendly guides detailing how to execute ValiPop with examples, all of which is publicly available.
+
+The fourth requirement focused on restoring and expanding the testing present in ValiPop. I achieved this first by fixing the initial tests included with ValiPop, by identifying and replacing the failing dependency. I then proceeded to add several end-to-end tests which verified the functionality of various features of ValiPop, as well adding some unit tests for cases such as testing user input.
+
+The fifth and final primary requirement focused on restoring the simulation code, such as integrating some inaccessible features and fixing bugs generally. This was achieved by integrating the graph output formats included with the old ValiPop using custom configuration options. I was also able to fix several bugs present in the record writing phase of ValiPop by refactoring and testing the record formats with various configurations. I also fixed certain bugs caused by unusual configurations by adding adequate error handling to user inputted configurations.
+
+#### 7.1.2. Secondary Requirements Met
+
+As well as meeting the primary requirements, I was also able to complete some secondary requirements to different degrees.
+
+The first secondary requirement focused on distributing a pre-compiled artefact to allow running ValiPop more easily. I achieved this fully by offering pre-compiled ValiPop JAR files on the Github repository, as well as using continuous integration to push compiled ValiPop images to the public GHCR.
+
+The second requirement focused on supporting additional output formats for the ValiPop population, making it more accessible and applicable. This was achieved partially by implementing an additional graph output format for representing the population geographically. However, I perhaps could have included additional record formats to further complete this requirement.
+
+The third requirement focused on rewriting the validation code to make it more easily maintainable and executable. I did not achieve this task due to the complexity of the R analysis and lack of equivalent resources for performing the analysis in Java. However I did aid in making the validation more easily executable by removing the unnecessary R dependencies and integrating the R scripts directly in the ValiPop JAR file.
+
+The fourth requirement focused on expanding the population simulation by adding additional features. I was not able to achieve this however due to a lack of time. I instead found there were too much work to be done with restoring the base ValiPop be fore I could start building upon it. 
+
+The fifth and final secondary requirement focused on improving the interface when running the VaiPop program. Whilst I was unable to implement a user-friendly terminal or graphical user interface, I did partially improve the ValiPop interface by adding detailed error handling of user inputs.
+
 ### 7.2. Challenges
 
-- I underestimated the difficulty to tackling an existing complex project
-    - The more I read through the software, the more I saw how complex sections were than what I originally thought
-- Recognising the unusual goal of this disseration
-    - Did I have a good approach for tackling the legacy code
-    - I feel like my engineering process worked well
-    - Altough I also felt like I initially spent too much time reading through the source code
-        - And that I should tried experimenting more with execution and parameters to understand how it worked from a blackbox view
-- difficutly with statistics
-    - Tough to understand, difficult to refactor
-    - Aided by conversations with the disseration student and research into P values
+Overall, I found restoring ValiPop to be much more difficult than I initially expected. As I studied the software, I gradually saw how complex certain sections were than what I originally tho thought. The goal of my dissertation was also quite unusual compared to most dissertations due to the focus being on restoring legacy software as opposed to developing my own from scratch. Consequently I had to take a a more cautious approach when working with ValiPop to preserve its existing functionality, which did make the project more challenging.
 
-### 7.3. Drawbacks
+Due to the general lack of documentation and context present in the old ValiPop, I was often left to speculate the purpose of certain design decisions and functionality. This was especially apparent in my discussion of removing deprecated configuration options in section [6.1.2]. However, discussions with Dr. Dalton and reading through his thesis did help greatly to contextualise some aspeccts of ValiPop.
 
-- I felt like I could have added additional features to the simulation
-    - However I also felt that there were also too many aspects left unfinished
-    - And how those needed to be polished first
+One aspect I found particularly challenging was working with the validation, and consequently the statistical side of ValiPop. Since I lacked the necessary knowledge to understand how the analysis actually validated the population, I needed to do additional research on the concepts used to allow me to refactor the validation and ensure its correctness.
 
-- Testing record formats
-- Validation of input distributions
-    - but much more complex
+I also found containerising ValiPop to be quite difficult due to the sheer amount of time it took to isolate the dependencies and formalise the build the steps of ValiPop. This also included creating the cluster images used by the distributed factor searching, which required experimenting and tweaking several options to achieve a networked cluster accessible to the user.
 
-### 7.3. Improvements
+### 7.3. Drawbacks and Improvements
 
-- Could I have simplified execution through other methods?
-    - Considering the time spent and difficulty of containerising
+Whilst I was able to achieve most of the requirements I set for myself, I still recognise there are some aspects which could be further improved. These encompass drawbacks of design decisions, and features I could not add to due time constraints.
 
-- Were I start again would have taken a different approach
-    - More focus on running program early
-    - Should have treated more like a blackbox early on
-    - Less focus on understanding source code
-        - Whilst useful, wasn't relevant to achieving most of the goals
-        - Felt like I understand it much better later on by executing and experimenting with the program
+For example, whilst implementing continuous integration was a novel feature to help verify ValiPop commits, it did require me to ultimately reduce the number of tests to smaller population sizes. Had I more time, I should have look into supporting all sizes of tests and just specifying which tests in particular should be run during continuous integration. Moreover, whilst I did add many tests to ValiPop, I feel I could have implemented even more. For example, I felt I should have added additional test configurations to the end-to-end population simulation tests, as whilst they did cover a variety of configurations which were relevant to my work on ValiPop, they did not cover every configuration option and their impacts. I also could have added more unit tests targeting the record output formats, as these were quite error prone when I originally tried them in the old ValiPop.
+
+I would have also liked to have added more logic into verifying and handling the input statistics. Whilst it was relatively simple to add handle configuration option parsing, the complexity and variety of the input statistics ultimately made handling errors in them too difficult to achieve in the time I had.
+
+I was also somewhat disappointed I did not have time to build upon the ValiPop simulation by adding new features to it. However, I also understand that the effort I placed into restoring the core ValiPop program was much more important and critical to my project, as highlighted into the project requirements. Ultimately, it was not feasible to try and expand the simulation code as I needed to focus on ensuring the underlying ValiPop was usable first.
+
+Regarding the containerisation of ValiPop, whilst it was ultimately successful in creating a single build artefact for ValiPop, I arguably achieved the same requirement through allowing ValiPop to be executed through a single JAR File. Therefore, the containerisation efforts were perhaps not as necessary as the other aspects I could have improved, especially considering the amount time I spent creating the images. Regardless, the ValiPop images do provide an alternate means of executing ValiPo,a, which does improve its accessability. Moreover, I developed the ValiPop images before creating the single ValiPop JAR files as solutions to the same problem, so most of this criticism is with hindsight.
+
+#### 7.3.1. Reflecting on my approach
+
+Were I to take on the restoration of ValiPop again, I would have taken a different approach. Firstly, I would have focused earlier on running the program and experimenting with its options as opposed to trying to fully understand the program beforehand through studying the code. I found that I when testing out the options of ValiPop and experimenting with its validation phase, I learned much quicker by example than I had from deciphering source code. In addition, whilst the time spent on learning the source code gave me a deeper understating of ValiPop, it was not always relevant for achieving my requirements. For example, having a deep understanding of the population simulation mechanisms helped in writing better documentation, but was not essential for the majority of my requirements, which focused on ValiPop as a whole.
+
+I would have also taken a more organised approach at the beginning of my development on ValiPop. Due to ValiPop's complexity, I would make small changes to ValiPop where I saw fit early in the project, but found it quite daunting to undertake larger tasks. Only near the end of the project did I finally try the larger tasks such as incorporating the R scripts within the JAR file. Instead I would have tried to structure the tasks from the start and tried to divide larger tasks into smaller, more-manageable ones to aid in the development. This would have also helped to organise the tasks on importance and ensure I the relevant ones first.
+
+Overall though, the approach I did take still allowed me to restore ValiPop to an accessible and documented program. Most importantly, I was able to achieve the all the primary requirements I set for myself before beginning the project, even if my approach could have been refined more.
 
 ## Conclusion
 
