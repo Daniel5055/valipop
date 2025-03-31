@@ -280,12 +280,19 @@ Therefore, this ultimately allowed for the validation phase of ValiPop to be run
 
 ### 6.3. The Results Recording
 
-### 6.3.1. Integrating graph formats
+The result recording phase of the old ValiPop was also implemented in Java. The simulated population would be written to birth, death, and marriage records based determined by the output format specified in the configuration. Once all the records were written the program terminated.
 
-- How I integrated graph formats and tested them
-- Adding an extra graph format, geojson
+#### 6.3.1. Refactoring record formats
 
-#### 6.3.2. Refactoring record formats
+Originally when executing the old ValiPop, I found that some of the supported record types would throw errors with certain populations. I did not catch this in the tests described in 6.1.1. due to exclusively using the TD record format, which consistently wrote records without error. I did not test different record formats in those tests as the focus was on testing the population simulation specifically. Moreover, I noticed  that despite each record format implementation being defined separately, they shared much of the same functionality such as handling IO. Therefore with these problems in mind, I chose to refactor the record writing functionality.
+
+I chose to refactor all the separate format implementations to extend from an abstract class which handled the generic functionality such as file creation and record writing. This decoupled the IO from the format definition, as each format implementation now only needed to map the population to record strings without concern for how they are written.
+
+In my implementation, the abstract class named `Record` defines functions to return iterable record strings for births, deaths, and marriages respectively given the population. These record strings include the relevant information to write and essentially represent one row each in the record format. I specifically chose the `Iterable` type for record strings as it defines as simple interface which only passes over the existing population once. As some generated populations could be millions in size, using iterable and stream like data structure help avoid implicit copies of elements which reduce the memory usage of the program.
+
+During my refactoring, I also resolved the errors I identified in the other records. Most of these errors were caused by unexpected null values in certain values and did not impact the formats much to solve. However it was difficult to confirm whether the records generated were as expected as many of the formats had vague names such as TD, DS, and EG_SKYE, which I could not find any information on.
+
+Regardless, I believe my refactoring of the record formats also allows for implementing new record types more easily as it encapsulates much of the difficult IO that occurs. Developers wishing to add new formats would just need to implement birth, death, and marriage record strings for their given format, and create a new class extending `Record` to map the population to those record strings.
 
 - Noticed how the implementations of each record format were separated but shared similar functionality
 - Choosing to refactor them all under an abstract class, which would handle  generic functionality
@@ -297,12 +304,29 @@ Therefore, this ultimately allowed for the validation phase of ValiPop to be run
     - Used iterable type to represent collection as only needed a simple interface to handle each element once (speed up (site)?), memory considerations
 - Therefore to implement a new format, just need to implement sourceRecords for births, deaths, and marriages to specify how a row is represented, and implement `Record` class to map the population to a source record for each overridden function
 
-- During this development, also add null safety to much of the formats
-    - Found that rare cases would cause failures due to lack of null safety oversights
+### 6.3.2. Integrating graph formats
+
+When I first repaired the old ValiPop tests, I noticed commented out tests for output formats not available to the user in ValiPop. These were specifically for the GEDCOM format, which is a common genealogical data structure (cite), and the GraphViz format, which is a file type for representing graphs. These formats appeared to be fully implemented, and I was able to execute them indirectly using the provided tests. However, they were not accessible to users using the ValiPop program and so I chose to integrate them directly. (images)
+
+To integrate them, I added a new configuration option `output_graph_format` which allowed users to specify which of the two formats they wanted to their population to be written to, or `NONE` if neither. In the results recording phase, I included the graph format implementations which wrote the graphs to files.
+
+Additionally, I found the defined interface for these graph formats to be quite simple to implement, so I also added a new format called GeoJson. The GeoJson format represents the birth addresses of the entire population, which can be potentially rendered on a map. This provided an interesting visualisation of the population from a geography perspective (image)
+
+Among the graph formats, only the GEDCOM format had proper testing in the old ValiPop, defining tests similar to those in section [6.1.1]. GEDCOM files were pre-generated and saved from various population sizes, and newly generated GEDCOM files could be compared with the saved files to ensure they were the same. I implemented this same strategy of testing for the GraphViz and GeoJson formats also, meaning all the graph formats had adequate end-to-end tests.
 
 ### 6.4. Further Developments
 
+This sub-section details the further developments made to ValiPop as a whole.
+
 #### 6.4.1. Handling User Input
+
+Whilst restoring ValiPop, I noticed a lack of error handling when reading user input. Malformed configurations would cause ambiguous error messages, and some nonsensical configurations would cause unexpected failures. Therefore I added custom error handling for user inputs to help identify how users misconfigured ValiPop.
+
+I implemented this by creating parse functions for each type of input, like strings, floating points, and positive integers. These would catch potential errors thrown during the parsing and throw custom errors which included the offending option and reason.
+
+I additionally added logic to prevent impossible configurations, such as the start date being grater than the end date. This also ensured that the dates forming the initialisation period of the simulation were adequately far apart. In the population simulation, there is a period before records are written where people may be spawned in spontaneously to create a variety of starting families. I found that a variety of bugs occurred if the initialisation period was too short, and so solved this problem through the input handling requiring a minimum period.
+
+To test my error handling, I created many configurations which try to pass invalid values for different properties. The tests then apply these configurations to ValiPop and ensure that an exception is thrown, with the relevant option included in the error message.
 
 - Adding custom error handling for user inputs and preventing impossible configurations
 - For each option, parse input and on error, notify user of offending option
@@ -315,6 +339,14 @@ Therefore, this ultimately allowed for the validation phase of ValiPop to be run
         - For example, found some bugs which occured if population was not given enough time to initialise 
 
 #### 6.4.2. Containerisation
+
+Before I managed to distribute the R scripts within the VailPop JAR file as mentioned in section [6.2.3], I opted to containerise ValiPop as an alternate way for it to run independently from the operating system. Containerisation is the act of packaging software with the necessary operating system libraries and dependencies to a create single lightweight executable which runs consistently on any infrastructure (cite IBM). These packages are called containers, and are defined using images, which provide the necessary instructions to construct a container (cite IBM).
+
+I initially chose to containerise ValiPop due to the R scripts and shell scripts that were required for the old ValiPop. A ValiPop image could be distributed easily and acted as a single artefact users could download and run without any dependency required except a container manager like Docker. However a disadvantage of containers is the complexity of configuring them while running. As containers are run isolated from the local machine, the user would need to mount directories on their local machine to the container to handle input and output from ValiPop. Additionally, development of container images can be quite tricky as it requires formalising each build step of ValiPop as well identifying every required dependency.
+
+I containerised ValiPop using Dockerfiles to build the image. First the image installs the necessary dependencies, which I identified through manually testing ValiPop and determining the adequate versions of dependencies to use. For example, I found that the R version included in the package repository of the base image was not recent enough for the features required, and so opted to use `wget` to install the specific version. I then utilised a concept for Dockerfiles called multi-stage builds, which allows data to be transfer between images (cite docker). In this case, one image contains the source code and dependencies required to compile ValiPop to a JAR file, and the resulting JAR file is transferred to a separate image with only the dependencies required to execute the ValiPop JAR file. This ultimately simplifies the image definitions by splitting it into smaller steps. It also reduces the size of the executable image as that does not require the source code included.
+
+Overall, by containerising ValiPop, I was able to create an alternate method for running ValiPop that is independent of the operating system and does not require users to install dependencies themselves.
 
 - Before distributing R with the JAR file as mentioned before
     - Focused on containerising ValiPop
@@ -334,8 +366,25 @@ Therefore, this ultimately allowed for the validation phase of ValiPop to be run
         - Each run was isolated so could add and remove dependencies
     - Difficult to implement, containers take a lot of effort to get right
 
-
 #### 6.4.3. Factor Searching
+
+As mentioned in section [6.2.], the validation score represents how similar a generated population was to its input statistics. In the case of a poor validation score, the old ValiPop provided mechanisms which helped the user tune ValiPop to produce more fitting populations. Specifically, programs were created to find configuration options which could correct the population during the simulation.
+
+Two programs were provided by the old ValiPop, the minima search program and the factor search program. The minima search program was implemented using a gradient descent algorithm to find the best factors, however this was created specifically to find optimal values for `birth_factor` and `death_factor` which were removed as described in [6.1.2]. the factor search program found effective values for `recovery_factor` and `proportional_recovery_factor` by testing each combination of a list of values. It was additionally multi-threaded, allowing several combinations to be tested simultaneously.
+
+Regarding he minima search, I considered modifying it to search based on the recovery factors instead. However, I was not certain whether small changes in those factors actually correlated with changes to the validation score, especially using random populations on each run like the minima search program did.
+
+Regarding the factor search, whilst it would technically execute more runs than a minima search to find the best combination of factors, it could be run in parallel much more easily. However I found the multi-threading to be inadequate for the factor search program, as it would potentially fail when testing many large populations simultaneously due to the limited memory on a single machine. Instead, I decided to reimplement the factor search to support distributing the runs across a cluster of machines. This allowed each run to leverage the resources of different machines, and could be scaled by simply adding more machines to the cluster.
+
+I implemented this distributed factor search using Apache Spark to manage the work over a cluster automatically. For each combination of factors, I would create a configuration and distribute the configurations among the cluster workers to execute in parallel. Notably, this required me to define serialisable  versions of the data being passed to workers. This implementation also supports running the factor search locally one machine, leveraging the number cores available to run in parallel. (image from apache showing cluster model?)
+
+However, to run Apache Spark, users would need to install Spark and pass the ValiPop JAR to a special Spark script. Therefore I opted to containerise the distributed factor search to allow for distributing this program without additional dependencies. However this came with the same disadvantages as describe in section [6.4.2] regarding the containersiation of ValiPop.
+
+To aid users in constructing their own clusters with the necessary dependencies to ValiPop, I also created images which can be used to create Spark clusters. These create stand-alone Spark clusters, which are one of the many type of clusters supported by Spark (cite). However, I found that configuring clusters and establishing the necessary addresses and networking to communicate within a cluster to be quite difficult, and this is likely only viable for advanced users.
+
+
+
+- Could talk about move to convert everything to spark.
 
 - Discussed how ValiPop handled case where population had poor validation score
     - Can be tuned with recovery factor
@@ -360,6 +409,12 @@ Therefore, this ultimately allowed for the validation phase of ValiPop to be run
         - And could not see much potential in parallelising the core of ValiPop
 
 #### 6.4.4. Continuous Integration
+
+During my work on ValiPop, I leverage the continuous integration features offered by Github Workflows. Github Workflows are sets of instructions which can be executed on remote machines whenever a change occurs in the ValiPop repository. 
+
+For example, I created a Work flow to build ValiPop and run its tests after every commit, which helped me verify that ValiPop remained functional. However, I found that the runners which executed theses tests remotely had quite limited memory, which forced me to scale down some of the tests which generated larger populations. However most tests remained unchanged, and the Github runners could still handle populations of up to 500,000 people.
+
+I also utilised Github Workflows for building and pushing images to the GitHub Container Registry (GHCR). The GHCR is a publicly available container registry which allowed me to easily distribute the images. On each commit, the images for the ValiPop image are built and pushed easily without any developer interaction needed. 
 
 - To aid me in development, established continuous integration using Github Worflow
     - Allows for ValiPop to built and tested after every commit to determine if it is functioning
@@ -423,6 +478,10 @@ Therefore, this ultimately allowed for the validation phase of ValiPop to be run
 - I felt like I could have added additional features to the simulation
     - However I also felt that there were also too many aspects left unfinished
     - And how those needed to be polished first
+
+- Testing record formats
+- Validation of input distributions
+    - but much more complex
 
 ### 7.3. Improvements
 
