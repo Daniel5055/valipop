@@ -328,6 +328,8 @@ I additionally added logic to prevent impossible configurations, such as the sta
 
 To test my error handling, I created many configurations which try to pass invalid values for different properties. The tests then apply these configurations to ValiPop and ensure that an exception is thrown, with the relevant option included in the error message.
 
+- Maybe also on validation error messages
+
 - Adding custom error handling for user inputs and preventing impossible configurations
 - For each option, parse input and on error, notify user of offending option
     - Allows for users to more easily develop configurations by avoiding ambiguous error messages
@@ -427,11 +429,17 @@ I also utilised Github Workflows for building and pushing images to the GitHub C
 
 ### 6.5. Documenting ValiPop
 
+To help in the restoration of ValiPop, I also documented much of what I learned about ValiPop for potential users and developers to read. However, as the audience of the documentation could range widely in technical skills, I generally focusing on making it simple to understand whilst as detailed as possible. To make the general documentation publicly available, I hosted the documentation from the Github repository using Github Pages. The documentation can viewed at the following address: https://stacs-srg.github.io/population-model/.
+
 - Generally about the aim of documentation to help users understand ValiPop 
 - Aimed at both end users and future developers
 - Consequently, needed to be simple to understand but also very detailed
 
-#### 6.5.1. References
+#### 6.5.1. Reference Sheets
+
+To aid in simplicity, I created several quick reference sheets for ValiPop, which acted like lists of definitions the user could lookup. For example, I created a quick reference sheet for the configuration options where for every possible option, I explained their purpose, expected values, and default values. I also provided aa contents table at the start of the document to make user navigation to these definitions easier (image). Moreover, I created anchor points in the document for each listed option, which allowed me link to specific options elsewhere in the documentation. This further helped quick navigation to option definitions, whilst also more closely connecting the documentation together.
+
+I also wrote similar quick references documenting the possible input statistics and possible generated results. These values were also given anchor points, allowing mentions to them elsewhere to also link back to their definitions. However instead of contents tables for these references, I opted to use diagrams which clearly defined their directory structure, such as in figure n (image). These diagrams were inspired by the shell command `tree` and were intended simply summarise the possible values which also included structural information.
 
 - To aid in simplicity, I made use of creating reference sheets which documented concepts in a list like format
 - For example, created reference for configuration option, where for every single option, explain purpose, expected value, and the default
@@ -445,12 +453,17 @@ I also utilised Github Workflows for building and pushing images to the GitHub C
 
 #### 6.5.2. Guides
 
+Initially the documentation I wrote only described the basic steps to run ValiPop with Java or Docker generically, with no real examples. However, I was concerned that this may be too complex for some users, and therefore chose to also write more in-depth guides which focused on running ValiPop with provided examples from start to finish. I believed this certainly helped the readability of the  documentation as the guides offered users a clear way to run valiPop while explaining to them what they should expect to see and how they could configure it further.
+
+
 - Created informational documentation on how to run ValiPop both locally and with Docker
     - Also created guides, which aim go into more detail and guides the user through running ValiPop from start to finished
     - Provides sample inputs and configurations to let users run ValiPop with, and explains to users how they can further modify the example
     - Helps readability and supporting new users using ValiPop
 
 #### 6.5.3. Development Documentation
+
+Additionally, I included documentation targeted for those seeking to develop ValiPop further. These documents included summaries of the inner workings of the population simulation and validation. They explained how each aspect of the population simulation operated and how the configuration inputs and input statistics were used internally. They also go into more depth behind the statistics used in the validation phase of ValiPop and how the contingency tables were generated. I believe this extra documentation was generally useful to include as it provided an overview of the ValiPop structure whilst the JavaDoc present in the source code could be read to further understand specific elements.
 
 - Additionally provided documentation intended for users seeking to develop further
 - Describes inner workings of population simulation and validation
