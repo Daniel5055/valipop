@@ -153,11 +153,6 @@ The other deprecated options where `birth_factor` and `death_factor`, which were
 
 I believe that removing deprecated features was relevant to restoring ValiPop as it ultimately simplifies the interface for users. With fewer configuration options for ValiPop, the documentation can be more succinct and configuration could be less intimidating with fewer required options. Of course in removing deprecated options, I would verify that the functionality was not altered through manual testing, and the automated end-to-end tests.
 
-#### 6.1.3. Refactoring
-
-- REfactoring OBDModel
-    - Honestly may not be worth mentioning
-
 ### 6.2. The Validation
 
 The population validation phase was originally written using R scripts to perform the statistical analysis, and shell scripts to interpret the results of the analysis. These scripts were invoked programmatically from Java, and the interpretation of the analysis was eventually read back into the Java program.
@@ -216,7 +211,7 @@ Regardless, I believe my refactoring of the record formats also allows for imple
 
 ### 6.3.2. Integrating graph formats
 
-When I first repaired the old ValiPop tests, I noticed commented out tests for output formats not available to the user in ValiPop. These were specifically for the GEDCOM format, which is a common genealogical data structure (gedcom.org, 2019), and the GraphViz format, which is a file type for representing graphs (The GraphViz Authors, 2025). These formats appeared to be fully implemented, and I was able to execute them indirectly using the provided tests. However, they were not accessible to users using the ValiPop program and so I chose to integrate them directly. (images)
+When I first repaired the old ValiPop tests, I noticed commented out tests for output formats not available to the user in ValiPop. These were specifically for the GEDCOM format, which is a common genealogical data structure (gedcom.org, 2019), and the GraphViz format, which is a file type for representing graphs (The GraphViz Authors, 2025). These formats appeared to be fully implemented, and I was able to execute them indirectly using the provided tests. However, they were not accessible to users using the ValiPop program and so I chose to integrate them directly.
 
 To integrate them, I added a new configuration option `output_graph_format` which allowed users to specify which of the two formats they wanted to their population to be written to, or `NONE` if neither. In the results recording phase, I included the graph format implementations which wrote the graphs to files.
 
@@ -237,8 +232,6 @@ I implemented this by creating parse functions for each type of input, like stri
 I additionally added logic to prevent impossible configurations, such as the start date being grater than the end date. This also ensured that the dates forming the initialisation period of the simulation were adequately far apart. In the population simulation, there is a period before records are written where people may be spawned in spontaneously to create a variety of starting families. I found that a variety of bugs occurred if the initialisation period was too short, and so solved this problem through the input handling requiring a minimum period.
 
 To test my error handling, I created many configurations which try to pass invalid values for different properties. The tests then apply these configurations to ValiPop and ensure that an exception is thrown, with the relevant option included in the error message.
-
-- Maybe also on validation error messages
 
 #### 6.4.2. Containerisation
 
@@ -265,8 +258,6 @@ I implemented this distributed factor search using [Apache Spark](https://spark.
 However, to run Apache Spark, users would need to install Spark and pass the ValiPop JAR to a special Spark script. Therefore I opted to containerise the distributed factor search to allow for distributing this program without additional dependencies. However this came with the same disadvantages as describe in section [[6.4.2]](#642-containerisation) regarding the containersiation of ValiPop.
 
 To aid users in constructing their own clusters with the necessary dependencies to ValiPop, I also created images which can be used to create Spark clusters. These create stand-alone Spark clusters, which are one of the many type of clusters supported by Spark. However, I found that configuring clusters and establishing the necessary addresses and networking to communicate within a cluster to be quite difficult, and this is likely only viable for advanced users.
-
-- Could talk about move to convert everything to spark.
 
 #### 6.4.4. Continuous Integration
 
@@ -348,8 +339,6 @@ I was also somewhat disappointed I did not have time to build upon the ValiPop s
 
 Regarding the containerisation of ValiPop, whilst it was ultimately successful in creating a single build artefact for ValiPop, I arguably achieved the same requirement through allowing ValiPop to be executed through a single JAR File. Therefore, the containerisation efforts were perhaps not as necessary as the other aspects I could have improved, especially considering the amount time I spent creating the images. Regardless, the ValiPop images do provide an alternate means of executing ValiPo,a, which does improve its accessability. Moreover, I developed the ValiPop images before creating the single ValiPop JAR files as solutions to the same problem, so most of this criticism is with hindsight.
 
-- Maybe mention memory performance
-
 #### 7.3.1. Reflecting on my approach
 
 Were I to take on the restoration of ValiPop again, I would have taken a different approach. Firstly, I would have focused earlier on running the program and experimenting with its options as opposed to trying to fully understand the program beforehand through studying the code. I found that I when testing out the options of ValiPop and experimenting with its validation phase, I learned much quicker by example than I had from deciphering source code. In addition, whilst the time spent on learning the source code gave me a deeper understating of ValiPop, it was not always relevant for achieving my requirements. For example, having a deep understanding of the population simulation mechanisms helped in writing better documentation, but was not essential for the majority of my requirements, which focused on ValiPop as a whole.
@@ -383,19 +372,12 @@ The Graphviz Authors (2025). Graphviz. *graphviz.org*. Retrieved from https://gr
 
 Smallay, I. and Susnjara, S. (2024, May 20). What is containerization. *IBM*. Retrieved from https://www.ibm.com/think/topics/containerization.
 
-Powell, P. and Smallay, I. (2025 August 9). What is container image? *IBM*. Retrieved from https://www.ibm.com/think/topics/container-images.
+Powell, P. and Smallay, I. (2025 August 9). What is a container image? *IBM*. Retrieved from https://www.ibm.com/think/topics/container-images.
 
 ## Appendix
 
-### Testing Summary
-
-- Mentioned in my implementation
-- Go into specifics of how my tests exactly confirm correctness?
-
 ### User Manual
 
-- Link to documentation, or include documentation here
+- Link to documentation
 
 ### Git Diff
-
-- Perhaps some light commentary on some of the diffed sections
